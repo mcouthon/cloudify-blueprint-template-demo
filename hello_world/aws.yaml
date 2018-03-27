@@ -1,0 +1,71 @@
+imports:
+#  - plugin:cloudify-aws-plugin?version=1.4.10
+  - http://www.getcloudify.org/spec/aws-plugin/1.4.10/plugin.yaml
+
+inputs:
+  image_id:
+    description: AWS EC2 image id to use for the server
+  instance_type:
+    description: AWS EC2 instance type to use for the server
+    default: m3.medium
+  key_pair_name:
+    description: AWS EC2 key pair name of the key to associate with the new server
+  vpc_name:
+    description: AWS EC2 VPC name
+  cidr_block:
+    description: AWS EC2 VPC CIDR block
+    default: 172.16.0.0/16
+
+
+node_types:
+  cloudify.nodes.Server:
+    derived_from: cloudify.aws.nodes.Instance
+    properties:
+      image_id:
+        default: { get_input: image_id }
+      instance_type:
+        default: { get_input: instance_type }
+
+node_templates:
+  ip:
+    type: cloudify.aws.nodes.ElasticIP
+
+  security_group:
+    type: cloudify.aws.nodes.SecurityGroup
+    properties:
+      description: Security group for Hello World VM
+      rules:
+        - ip_protocol: {{ tcp }} #tcp
+          cidr_ip: 0.0.0.0/0
+          from_port: { get_input: webserver_port }
+          to_port: { get_input: webserver_port }
+
+  keypair:
+    type: cloudify.aws.nodes.KeyPair
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: key_pair_name }
+      private_key_path: { get_input: agent_private_key_path }
+
+  network:
+    type: cloudify.aws.nodes.VPC
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: vpc_name }
+      cidr_block: { get_input: cidr_block }
+
+relationships:
+  server_connected_to_ip:
+    derived_from: cloudify.aws.relationships.instance_connected_to_elastic_ip
+  server_connected_to_security_group:
+    derived_from: cloudify.aws.relationships.instance_connected_to_security_group
+  server_connected_to_keypair:
+    derived_from: cloudify.aws.relationships.instance_connected_to_keypair
+  server_connected_to_network:
+    derived_from: cloudify.relationships.connected_to
+
+outputs:
+  http_endpoint:
+    description: Web server's external endpoint
+    value: { concat: ['http://', { get_attribute: [ip, aws_resource_id] },
+                      ':', { get_input: webserver_port }] }

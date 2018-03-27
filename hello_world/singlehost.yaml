@@ -1,0 +1,17 @@
+inputs:
+  server_ip:
+    description: >
+      The ip of the server the application will be deployed on.
+
+node_types:
+  cloudify.nodes.Server:
+    derived_from: cloudify.nodes.Compute
+    properties:
+      ip:
+        default: { get_input: server_ip }
+
+outputs:
+  http_endpoint:
+    description: Web server external endpoint
+    value: { concat: ['http://', { get_property: [ vm, ip ] },
+                      ':', { get_property: [http_web_server, port] }] }
