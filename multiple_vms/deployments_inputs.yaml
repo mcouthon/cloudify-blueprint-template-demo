@@ -1,0 +1,13 @@
+os_image: os_image
+os_flavor: os_flavor
+os_network: os_network
+os_keypair: os_keypair
+os_security_group: os_security_group
+ssh_user: user_ssh
+ssh_private_key_path: ssh_private_key_path
+os_username: os_username
+os_password: os_password
+os_tenant: os_tenant
+os_auth_url: os_ait
+os_region: os_region
+os_subnet: os_subnet

@@ -11,5 +11,5 @@ imports:
   - http://www.getcloudify.org/spec/openstack-plugin/2.5.2/plugin.yaml
   - multiple_vms/inputs.yaml
   - multiple_vms/common.yaml
-  - multiple_vms/relationships.yaml
+#  - multiple_vms/relationships.yaml
   - multiple_vms/private_fixed_ip.yaml

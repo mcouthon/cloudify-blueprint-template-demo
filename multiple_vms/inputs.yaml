@@ -12,7 +12,10 @@ inputs:
   os_server_group_policy:
     description: The policy to use for the server group
     default: affinity
-
+  ssh_user:
+    description: ssh user
+  ssh_private_key_path:
+    description: ssh_private_key_path
   os_username:
     description: Username to authenticate to OpenStack with
   os_password:
