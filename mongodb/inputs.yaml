@@ -1,0 +1,8 @@
+agent_key_private: a
+agent_user: a
+mongo_version: a
+image: a
+manager_network: a
+agent_key_public: a
+network_deployment_name: a
+flavor: a
