@@ -31,9 +31,16 @@ node_templates:
       agent_config:
         user: { get_input: agent_user }
         key: { get_input: agent_private_key_path }
-        install_method: {%if init_script %}init_script{% else %}remote{% endif %}
-    {% if windows and not init_script %}
+        install_method: {% if init_script %}init_script{% else %}remote{% endif %}
+    {% if windows %}
+      os_family: windows
+    {% endif %}
+  {% if windows and not init_script and impl != "singlehost" %}
+    {% if impl == "aws" %}
       parameters:
+    {% elif impl == "openstack" %}
+      server:
+    {% endif %}
         user_data: |
           <powershell>
           &winrm quickconfig -q
@@ -45,7 +52,7 @@ node_templates:
           &netsh advfirewall firewall add rule name="WinRM 5986" protocol=TCP dir=in localport=5986 action=allow
           Set-ExecutionPolicy Unrestricted
           </powershell>
-    {% endif %}
+  {% endif %}
 
     # Singlehost blueprint doesn't require those relationships
     {% if impl != "singlehost" %}
