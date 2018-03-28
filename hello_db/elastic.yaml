@@ -1,0 +1,17 @@
+node_types:
+  cloudify.nodes.DB:
+    derived_from: cloudify.nodes.elasticDB
+  cloudify.nodes.elasticDB:
+    derived_from: cloudify.nodes.DBMS
+    properties:
+      port:
+        description: elasticsearch port
+        type: integer
+        default: 9200
+      clusterName:
+         description: elasticsearch cluster name
+         type: string
+         default: cluster
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create: scripts/elasticsearch/install-elasticsearch.sh

@@ -1,0 +1,8 @@
+agent_user: 'centos'
+image: 'CentOS-7-x86_64-GenericCloud'
+webserver_port: 8080
+agent_private_key_path: '~/.ssh/cloudify-manager-kp.pem'
+floating_network_id: 'dda079ce-12cf-4309-879a-8e67aec94de4'
+key_pair_name: 'cloudify-manager-kp'
+flavor: 'm1.small'
+network_name: 'management-network'

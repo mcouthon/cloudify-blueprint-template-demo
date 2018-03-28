@@ -1,0 +1,5 @@
+{
+  "impl" : "openstack",
+  "db" : "maria",
+  "validate": true
+}
