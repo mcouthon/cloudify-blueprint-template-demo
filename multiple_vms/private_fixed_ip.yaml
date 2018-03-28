@@ -71,7 +71,7 @@ node_templates:
 #              fixed_ips: { get_attribute: [ resource, fixed_ip ] }
 
   {% for ip in ips_list %}
-    os_port:
+  os_port:
     type: cloudify.openstack.nodes.Port
     properties:
       openstack_config: *openstack_configuration
@@ -93,8 +93,6 @@ node_templates:
       target: os_subnet
     - type: cloudify.openstack.port_connected_to_security_group
       target: os_security_group
-    - type: cloudify.relationships.depends_on
-      target: resource
 
 #  host:
 #    type: cloudify.openstack.nodes.Host
@@ -124,30 +122,30 @@ node_templates:
 
   {% for hostname in hosts_list %}
     host:
-    type: cloudify.openstack.nodes.Host
-    relationships:
-      - type: cloudify.openstack.server_connected_to_keypair
-        target: os_keypair
-      - type: server_connected_to_port
-        target: os_port
-      - type: cloudify.openstack.server_connected_to_server_group
-        target: os_server_group
-      # We're doing "contained_in" here, in order to take advantage of the
-      # scaling semantics. We need all group members to be contained
-      # in the same node
-      - type: cloudify.relationships.contained_in
-        target: os_network
-      - type: cloudify.relationships.depends_on
-        target: resource
-    interfaces:
-      cloudify.interfaces.lifecycle:
-        create:
-          implementation: openstack.nova_plugin.server.create
-          inputs:
-            args:
-              security_groups: [{ get_attribute: [ os_security_group, external_name ]}]
-              block_device_mapping_v2: { get_input: os_device_mapping }
-              name: {{hostname}}
+      type: cloudify.openstack.nodes.Host
+      relationships:
+        - type: cloudify.openstack.server_connected_to_keypair
+          target: os_keypair
+        - type: server_connected_to_port
+          target: os_port
+        - type: cloudify.openstack.server_connected_to_server_group
+          target: os_server_group
+        # We're doing "contained_in" here, in order to take advantage of the
+        # scaling semantics. We need all group members to be contained
+        # in the same node
+        - type: cloudify.relationships.contained_in
+          target: os_network
+  #      - type: cloudify.relationships.depends_on
+  #        target: resource
+      interfaces:
+        cloudify.interfaces.lifecycle:
+          create:
+            implementation: openstack.nova_plugin.server.create
+            inputs:
+              args:
+                security_groups: [{ get_attribute: [ os_security_group, external_name ]}]
+                block_device_mapping_v2: { get_input: os_device_mapping }
+                name: {{hostname}}
   {% endfor %}
 
 groups:
