@@ -1,0 +1,31 @@
+inputs:
+
+  new_database_password:
+    default: new_password
+
+  new_database_user:
+    default: demo
+
+  mysql_commands:
+    default:
+    - { concat: [ "UPDATE mysql.user SET Password = PASSWORD('", { get_input: new_database_password }, "') WHERE User = 'root'" ] }
+    - "DROP USER ''@'localhost'"
+    # # - { concat: [ "DROP USER ''@''" ] }
+    - "DROP DATABASE test"
+    - { concat: [ "CREATE USER '", { get_input: new_database_user }, "'@'%' IDENTIFIED BY '", { get_input: new_database_password }, "'" ] }
+    - { concat: [ "GRANT ALL PRIVILEGES ON *.* TO '", { get_input: new_database_user }, "'@'%' WITH GRANT OPTION" ] }
+    - "FLUSH PRIVILEGES"
+
+node_types:
+  cloudify.nodes.DB:
+    derived_from: cloudify.nodes.mariaDB
+  cloudify.nodes.mariaDB:
+    derived_from: cloudify.nodes.DBMS
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: scripts/mariadb/create.py
+        configure:
+          implementation: scripts/mariadb/configure.py
+        start:
+          implementation: scripts/mariadb/start.py

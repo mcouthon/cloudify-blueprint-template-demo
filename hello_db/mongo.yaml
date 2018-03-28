@@ -1,0 +1,38 @@
+node_types:
+  cloudify.nodes.DB:
+    derived_from: cloudify.nodes.mongoDB
+  cloudify.nodes.mongoDB:
+    derived_from: cloudify.nodes.DBMS
+    properties:
+      port:
+        description: MongoDB port
+        type: integer
+        default: 27017
+      install:
+        description: install or just connect to existing
+        type: boolean
+        default: true
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: mongodb/scripts/install_mongodb.sh
+          inputs:
+            mongo_version:
+              type: string
+              default: 3.2.3
+            install_mode:
+              type: boolean
+              description: true = install, false = uninstall
+              default: true
+        delete:
+          implementation: mongodb/scripts/install_mongodb.sh
+          inputs:
+            mongo_version:
+              type: string
+              default: 3.2.3
+            install_mode:
+              type: boolean
+              description: true = install, false = uninstall
+              default: false
+        start: mongodb/scripts/start_mongodb_primery_daemon.py
+        stop: mongodb/scripts/stop_mongodb_primery_daemon.py
