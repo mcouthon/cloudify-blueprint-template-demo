@@ -22,7 +22,7 @@ inputs:
 
 node_types:
   cloudify.nodes.Server:
-    derived_from: cloudify.aws.nodes.Instance
+    derived_from: {% if windows %}cloudify.aws.nodes.WindowsInstance{% else %}cloudify.aws.nodes.Instance{% endif%}
     properties:
       image_id:
         default: { get_input: image_id }

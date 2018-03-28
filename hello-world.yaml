@@ -32,9 +32,6 @@ node_templates:
         user: { get_input: agent_user }
         key: { get_input: agent_private_key_path }
         install_method: {% if init_script %}init_script{% else %}remote{% endif %}
-    {% if windows %}
-      os_family: windows
-    {% endif %}
   {% if windows and not init_script and impl != "singlehost" %}
     {% if impl == "aws" %}
       parameters:
