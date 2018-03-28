@@ -1,0 +1,12 @@
+# OpenStack imports, definitions and templates
+# The API of such a file are 2 node template - `ip` and `host`, which must
+# have 2 properties: `ip` (comes by default) and `public_ip`
+
+imports:
+  # TODO: Change to using the plugin: syntax in offline environments
+#  - plugin:cloudify-openstack-plugin?version=2.5.2
+  - http://www.getcloudify.org/spec/openstack-plugin/2.5.2/plugin.yaml
+  - inputs.yaml
+  - common.yaml
+  - relationships.yaml
+  - private_fixed_ip.yaml
