@@ -1,6 +1,9 @@
 imports:
-#  - plugin:cloudify-aws-plugin?version=1.4.10
+{% if validate %}
   - http://www.getcloudify.org/spec/aws-plugin/1.4.10/plugin.yaml
+{% else %}
+  - plugin:cloudify-aws-plugin?version=1.4.10
+{% endif %}
 
 inputs:
   image_id:
@@ -53,16 +56,6 @@ node_templates:
       use_external_resource: true
       resource_id: { get_input: vpc_name }
       cidr_block: { get_input: cidr_block }
-
-relationships:
-  server_connected_to_ip:
-    derived_from: cloudify.aws.relationships.instance_connected_to_elastic_ip
-  server_connected_to_security_group:
-    derived_from: cloudify.aws.relationships.instance_connected_to_security_group
-  server_connected_to_keypair:
-    derived_from: cloudify.aws.relationships.instance_connected_to_keypair
-  server_connected_to_network:
-    derived_from: cloudify.relationships.connected_to
 
 outputs:
   http_endpoint:

@@ -1,8 +1,11 @@
 # Openstack implementation
 
 imports:
-#  - plugin:cloudify-openstack-plugin?version=2.0.1
+{% if validate %}
   - http://www.getcloudify.org/spec/openstack-plugin/2.0.1/plugin.yaml
+{% else %}
+  - plugin:cloudify-openstack-plugin?version=2.0.1
+{% endif %}
 
 inputs:
   image:
@@ -18,7 +21,7 @@ inputs:
 
 node_types:
   cloudify.nodes.Server:
-    derived_from: cloudify.openstack.nodes.Server
+    derived_from: {% if windows %}cloudify.openstack.nodes.WindowsServer{% else %}cloudify.openstack.nodes.Server{% endif%}
     properties:
       image:
         default: { get_input: image }
@@ -60,16 +63,6 @@ node_templates:
     properties:
       resource_id: { get_input: network_name }
       use_external_resource: true
-
-relationships:
-  server_connected_to_ip:
-    derived_from: cloudify.openstack.server_connected_to_floating_ip
-  server_connected_to_security_group:
-    derived_from: cloudify.openstack.server_connected_to_security_group
-  server_connected_to_keypair:
-    derived_from: cloudify.openstack.server_connected_to_keypair
-  server_connected_to_network:
-    derived_from: cloudify.relationships.connected_to
 
 outputs:
   http_endpoint:

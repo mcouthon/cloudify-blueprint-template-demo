@@ -1,3 +1,0 @@
-node_types:
-  cloudify.nodes.Server:
-    derived_from: cloudify.nodes.Compute

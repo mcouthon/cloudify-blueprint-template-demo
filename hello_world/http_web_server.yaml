@@ -1,0 +1,24 @@
+{% macro script_name(script) -%}
+  {% if windows %}
+          implementation: scripts/powershell/{{ script }}.ps1
+          inputs:
+            process:
+              command_prefix: powershell
+  {% else %}
+           implementation: scripts/{{ script }}.sh
+  {% endif %}
+{% endmacro %}
+
+node_templates:
+  http_web_server:
+    type: cloudify.nodes.WebServer
+    properties:
+      port: { get_input: webserver_port }
+    relationships:
+      - type: cloudify.relationships.contained_in
+        target: vm
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        configure: {{ script_name('configure') }}
+        start: {{ script_name('start') }}
+        stop: {{ script_name('stop') }}

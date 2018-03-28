@@ -1,0 +1,26 @@
+{% if impl != "singlehost" %}
+relationships:
+  server_connected_to_ip:
+  {% if impl == 'aws' %}
+    derived_from: cloudify.aws.relationships.instance_connected_to_elastic_ip
+  {% elif impl == 'openstack' %}
+    derived_from: cloudify.openstack.server_connected_to_floating_ip
+  {% endif %}
+
+  server_connected_to_security_group:
+  {% if impl == 'aws' %}
+    derived_from: cloudify.aws.relationships.instance_connected_to_security_group
+  {% elif impl == 'openstack' %}
+    derived_from: cloudify.openstack.server_connected_to_security_group
+  {% endif %}
+
+  server_connected_to_keypair:
+  {% if impl == 'aws' %}
+    derived_from: cloudify.aws.relationships.instance_connected_to_keypair
+  {% elif impl == 'openstack' %}
+    derived_from: cloudify.openstack.server_connected_to_keypair
+  {% endif %}
+
+  server_connected_to_network:
+    derived_from: cloudify.relationships.connected_to
+{% endif %}
