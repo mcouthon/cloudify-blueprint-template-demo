@@ -1,0 +1,14 @@
+{% macro keypair(name, cloud='openstack', keypair_name=None, key_path=None) -%}
+  {% if cloud == 'openstack' %}
+    {% set type = 'cloudify.openstack.nodes.KeyPair' %}
+  {% else %}
+    {% set type = 'cloudify.aws.nodes.KeyPair' %}
+  {% endif %}
+
+  {{ name }}:
+    type: {{ type }}
+    properties:
+      use_external_resource: true
+      resource_id: { get_input: {{ keypair_name }} }
+      private_key_path: { get_input: {{ key_path }} }
+{% endmacro %}

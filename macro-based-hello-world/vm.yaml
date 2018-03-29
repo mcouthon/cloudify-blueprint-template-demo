@@ -1,0 +1,48 @@
+{%
+
+macro vm(name, cloud='openstack', user='centos',
+key='agent_private_key', image=None, flavor=None, image_id=None,
+instance_type=None, ip=None, security_group=None, keypair=None, network=None)
+
+-%}
+
+  {% if cloud == 'openstack' %}
+    {% set vm_type = 'cloudify.openstack.nodes.Server' %}
+    {% set ip_rel_type = 'cloudify.openstack.server_connected_to_floating_ip' %}
+    {% set sec_group_type = 'cloudify.openstack.server_connected_to_security_group' %}
+    {% set keypair_type = 'cloudify.openstack.server_connected_to_keypair' %}
+  {% else %}
+    {% set vm_type = 'cloudify.aws.nodes.Instance' %}
+    {% set ip_rel_type = 'cloudify.aws.relationships.instance_connected_to_elastic_ip' %}
+    {% set sec_group_type = 'cloudify.aws.relationships.instance_connected_to_security_group' %}
+    {% set keypair_type = 'cloudify.aws.relationships.instance_connected_to_keypair' %}
+  {% endif %}
+
+  {{ name }}:
+    type: {{ vm_type }}
+    properties:
+      agent_config:
+        user: { get_input: {{ user }} }
+        key: { get_input: {{ key }} }
+    {% if cloud == 'openstack' %}
+
+      image: { get_input: {{ image }} }
+      flavor: { get_input: {{ flavor }} }
+
+    {% else %}
+
+      image_id: { get_input: {{ image_id }} }
+      instance_type: { get_input: {{ instance_type }} }
+
+    {% endif %}
+
+    relationships:
+      - type: {{ ip_rel_type }}
+        target: {{ ip }}
+      - type: {{ sec_group_type }}
+        target: {{ security_group }}
+      - type: {{ keypair_type }}
+        target: {{ keypair }}
+      - type: cloudify.relationships.connected_to
+        target: {{ network }}
+{% endmacro %}

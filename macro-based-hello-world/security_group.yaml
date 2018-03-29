@@ -1,0 +1,24 @@
+{% macro security_group(name, cloud='openstack', rules=()) -%}
+  {% if cloud == 'openstack' %}
+    {% set type = 'cloudify.openstack.nodes.SecurityGroup' %}
+  {% else %}
+    {% set type = 'cloudify.aws.nodes.SecurityGroup' %}
+  {% endif %}
+
+  {{ name }}:
+    type: {{ type }}
+    properties:
+      description: A {{ cloud }} security group
+      rules:
+      {% for rule in rules %}
+        {% if cloud == 'openstack' %}
+        - port: {{ rule[0] }}
+          remote_ip_prefix: {{ rule[1] }}
+        {% else %}
+        - ip_protocol: {% if rule|length == 2 %} {{ rule[2] }} {% else %} tcp {% endif %}
+          cidr_ip: {{ rule[1] }}
+          from_port: {{ rule[0] }}
+          to_port: {{ rule[0] }}
+        {% endif %}
+      {% endfor %}
+{% endmacro %}

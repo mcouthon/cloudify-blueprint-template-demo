@@ -1,0 +1,15 @@
+{% macro ip(name, cloud='openstack', floating_network_id=None) -%}
+  {% if cloud == 'openstack' %}
+    {% set type = 'cloudify.openstack.nodes.FloatingIP' %}
+  {% else %}
+    {% set type = 'cloudify.aws.nodes.ElasticIP' %}
+  {% endif %}
+
+  {{ name }}:
+    type: {{ type }}
+    {% if cloud == 'openstack' %}
+    properties:
+      floatingip:
+        floating_network_id: { get_input: {{ floating_network_id }} }
+    {% endif %}
+{% endmacro %}

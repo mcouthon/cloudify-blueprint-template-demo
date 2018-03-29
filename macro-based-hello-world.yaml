@@ -1,0 +1,71 @@
+{% from 'macro-based-hello-world/vm.yaml' import vm %}
+{% from 'macro-based-hello-world/ip.yaml' import ip %}
+{% from 'macro-based-hello-world/network.yaml' import network %}
+{% from 'macro-based-hello-world/keypair.yaml' import keypair %}
+{% from 'macro-based-hello-world/security_group.yaml' import security_group %}
+
+tosca_definitions_version: cloudify_dsl_1_3
+
+description: Macro-based hello world blueprint
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/4.4.dev1/types.yaml
+  - http://www.getcloudify.org/spec/openstack-plugin/2.0.1/plugin.yaml
+  - http://www.getcloudify.org/spec/aws-plugin/1.4.10/plugin.yaml
+
+inputs:
+  agent_user_1:
+    default: centos
+  agent_user_2:
+    default: centos
+
+  agent_private_key:
+    default: /etc/cloudify/ssh_key
+
+  webserver_port:
+    default: 8080
+
+  os_image:
+    default: image
+  os_flavor:
+    default: flavor
+  os_network_name:
+    default: network_name
+  os_keypair_name:
+    default: keypair_name
+  os_floating_network_id:
+    default: floating_network_id
+
+  aws_image_id:
+    default: image_id
+  aws_instance_type:
+    default: instance_type
+  aws_network_name:
+    default: network_name
+  aws_keypair_name:
+    default: keypair_name
+  aws_cidr_block:
+    default: 172.16.0.0/16
+
+node_templates:
+  ###########
+  # OPENSTACK
+  ###########
+  {{ network('os_network', 'openstack', 'os_network_name') }}
+  {{ keypair('os_keypair', 'openstack', 'os_keypair_name', 'agent_private_key') }}
+  {{ security_group('os_sec_group', 'openstack',
+    rules=[(22, '0.0.0.0/0'), ('{get_input: webserver_port}', '0.0.0.0/0')]) }}
+  {{ ip('os_ip', 'openstack', 'os_floating_network_id') }}
+  {{ vm('os_vm', cloud='openstack', user='agent_user_1', image='os_image', flavor='os_flavor',
+  ip='os_ip', security_group='os_sec_group', keypair='os_keypair', network='os_network') }}
+
+  #####
+  # AWS
+  #####
+  {{ network('aws_network', 'aws', 'aws_network_name', cidr_block='aws_cidr_block') }}
+  {{ keypair('aws_keypair', 'aws', 'aws_keypair_name', 'agent_private_key') }}
+  {{ security_group('aws_sec_group', 'aws',
+    rules=[(22, '0.0.0.0/0'), ('{get_input: webserver_port}', '0.0.0.0/0')]) }}
+  {{ ip('aws_ip', 'aws') }}
+  {{ vm('aws_vm', cloud='aws', user='agent_user_2', image_id='aws_image_id', instance_type='aws_instance_type',
+  ip='aws_ip', security_group='aws_sec_group', keypair='aws_keypair', network='aws_network') }}

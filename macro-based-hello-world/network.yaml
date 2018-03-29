@@ -1,0 +1,24 @@
+{% macro network(name, cloud='openstack', network_name=None,
+cidr_block=None) -%}
+  {% if cloud == 'openstack' %}
+    {% set type = 'cloudify.openstack.nodes.Network' %}
+  {% else %}
+    {% set type = 'cloudify.aws.nodes.VPC' %}
+  {% endif %}
+
+  {{ name }}:
+    type: {{ type }}
+    properties:
+      use_external_resource: true
+
+    {% if cloud == 'openstack' %}
+
+      resource_id: { get_input: {{ network_name  }} }
+
+    {% else %}
+
+      resource_id: { get_input: {{ network_name }} }
+      cidr_block: { get_input: {{ cidr_block }} }
+
+    {% endif %}
+{% endmacro %}
